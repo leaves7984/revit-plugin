@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -115,6 +116,7 @@
     <Compile Include="Commands\PlaceLoopElement.cs" />
     <Compile Include="Commands\PlanView.cs" />
     <Compile Include="Commands\ProjectRay.cs" />
+    <Compile Include="exportNWC.cs" />
     <Compile Include="Plugin\ExternalApplication.cs" />
     <Compile Include="Plugin\GetAllFamily.cs" />
     <Compile Include="Plugin\GetNetWallArea.cs" />
@@ -135,6 +137,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)"."" "$(AppData)\Autodesk\Revit\Addins\2019\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -258,7 +258,10 @@ namespace RevitPlugin02
                             schedule.Definition.IsItemized = false;
                         }
                         if (field.ParameterId == lengthId) {
-                      
+
+                            FormatOptions formatOpt = new FormatOptions(DisplayUnitType.DUT_DECIMAL_FEET, UnitSymbolType.UST_FT, 0.01);
+                            formatOpt.UseDefault = false;
+                            field.SetFormatOptions(formatOpt);
                             field.DisplayType = ScheduleFieldDisplayType.Totals;
                         }
                     }
@@ -385,7 +388,7 @@ namespace RevitPlugin02
                 // length schedule
                 if (path.Contains("-2"))
                 {
-
+                    readLengthSchedule(path);
                 }
                 // material takeoff
                 else if (path.Contains("-3"))
@@ -436,6 +439,40 @@ namespace RevitPlugin02
 
             sr.Close();
             fs.Close();
+        }
+        public static void readLengthSchedule(String path)
+        {
+            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+            StreamReader sr = new StreamReader(fs);
+            string str = "";
+            string head = sr.ReadLine();
+            String[] lines = null;
+            if (head != null)
+            {
+                sr.ReadLine();
+                while ((str = sr.ReadLine()) != null)
+                {
+                    str = str.Replace("\"", "");
+                    lines = str.Split(',');
+                    if (lines.Length == 2)
+                    {
+                        String count = lines[1];
+                        String keynote = lines[0];
+                        if (keynote.Length > 2)
+                        {
+                            Product p = new Product(keynote, count);
+                            list.Add(p);
+                            System.Diagnostics.Debug.WriteLine(keynote + ":" + count);
+                        }
+
+                    }
+
+                }
+            }
+
+            sr.Close();
+            fs.Close();
+
         }
         public static void readCountSchedule(String path)
         {
@@ -549,22 +586,22 @@ namespace RevitPlugin02
                 createCountSchedule( "Structural Connection", new ElementId(BuiltInCategory.OST_StructConnections));
                 createCountSchedule( "Telephone Device", new ElementId(BuiltInCategory.OST_TelephoneDevices));
 
-
                 createLengthSchedule( "Wall Sweep-2", new ElementId(BuiltInCategory.OST_Walls));
 
-                
                 createMaterialTakeOffSchedule( "Roofs-3", new ElementId(BuiltInCategory.OST_Roofs));
                 createMaterialTakeOffSchedule( "Floors-3", new ElementId(BuiltInCategory.OST_Floors));
+
                 createMaterialTakeOffSchedule("Walls-3", new ElementId(BuiltInCategory.OST_Walls));
-                //getNetWallArea();
-                readExcelFromFolder();
-                String info = "1,demo,talece";
-                TaskDialog.Show("Cost", string.Format("list ${0}", list));
-                PostObject postData = new PostObject(info, list);
-                var json = JsonConvert.SerializeObject(postData);
                 
-                String result = HttpPost(root_api + "getTotalCostBySchedules", json);
-                TaskDialog.Show("Cost", string.Format("total ${0}", result));
+                getNetWallArea();
+                //readExcelFromFolder();
+                //String info = "1,demo,talece";
+                //TaskDialog.Show("Cost", list.ToString());
+                //PostObject postData = new PostObject(info, list);
+                //var json = JsonConvert.SerializeObject(postData);
+                
+                //String result = HttpPost(root_api + "getTotalCostBySchedules", json);
+                //TaskDialog.Show("Cost", string.Format("total ${0}", result));
                 
                 return Result.Succeeded;
             }
